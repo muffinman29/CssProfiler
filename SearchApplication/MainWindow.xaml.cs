@@ -13,6 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using System.Windows.Forms;
+using System.Threading;
+using System.Diagnostics;
 
 namespace SearchApplication
 {
@@ -26,33 +29,103 @@ namespace SearchApplication
             InitializeComponent();
         }
 
+        
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            lstResults.SelectedIndex = -1;
             lstResults.Items.Clear();
-            List<string> files = new List<string>();
-            foreach (var item in ParseFileExtensions())
-            {
-                files.AddRange(Directory.EnumerateFiles(tbFilePath.Text).Where(x => x.EndsWith(item)));
-            }
-            
-            
-            foreach (var file in files)
-            {  
-                    var fileContents = File.ReadAllLines(file);
-
-                    for (int i = 0; i < fileContents.Length; i++)
-                    {
-                        if (fileContents[i].Contains(tbSearchCriteria.Text))
-                        {
-                            lstResults.Items.Add(String.Format("{0} : Ln {1}", file, i.ToString()));
-                        }
-                    }      
-            }
+            GetDirectories();
         }
 
-        private string[] ParseFileExtensions()
+        private void GetDirectories()
         {
-            return tbFileExtensions.Text.Split(',');
+            List<string> files = new List<string>();
+            var rootDirectory = tbFilePath.Text;
+
+            var directories = Directory.GetDirectories(rootDirectory).ToList();
+
+            for (int i = 0; i < directories.Count; i++)
+            {
+                try
+                {
+                    directories.AddRange(Directory.GetDirectories(directories[i]).ToList());
+                }
+                catch
+                {
+
+                }
+
+            }
+
+            directories.Add(rootDirectory);
+            string[] fileExtensions = tbFileExtensions.Text.Split(',');
+
+            Parallel.ForEach(directories, (directory) => 
+                {
+                    try { files.AddRange(Directory.EnumerateFiles(directory).Where(x => fileExtensions.Contains(x.Substring(x.Length - 4, 4)))); }
+                    catch{}
+                }
+                );           
+
+            DisplayResultInformation(directories.Count, files.Count, files);
+        }
+
+        private async void DisplayResultInformation(int directoryCount, int fileCount, List<String> directoriesToSearch)
+        {
+            lbNumberOfFiles.Content = String.Format("Number of folders: {0}. Files found: {1}", directoryCount.ToString(), fileCount.ToString());
+
+
+            string line;
+            foreach (var file in directoriesToSearch)
+            {
+                try
+                {
+                    using (StreamReader reader = new StreamReader(file))
+                    {
+                        while ((line = await reader.ReadLineAsync()) != null)
+                        {
+                            if (line.Contains(tbSearchCriteria.Text))
+                            {
+                                lstResults.Items.Add(file);
+                            }
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                    
+                }
+                
+            }
+        }
+             
+        private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            DialogResult result = fbd.ShowDialog();
+
+            //string[] files = Directory.GetFiles(fbd.SelectedPath);
+            //System.Windows.Forms.MessageBox.Show("Files found: " + files.Length.ToString(), "Message");
+
+            tbFilePath.Text = fbd.SelectedPath;
+
+            
+        }
+
+        private void lstResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                Process.Start(@lstResults.SelectedItem.ToString());
+            }
+            catch (Exception)
+            {
+                
+               
+            }
+            
         }
     }
 }
