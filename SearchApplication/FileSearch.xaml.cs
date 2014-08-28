@@ -34,14 +34,21 @@ namespace SearchApplication
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             lstResults.SelectedIndex = -1;
-            lstResults.Items.Clear();            
+            lstResults.Items.Clear();
+            lbNumberOfFiles.Content = "Searching, please wait...";
             GetDirectories();
         }
 
         private void GetDirectories()
         {
+            
             List<string> files = new List<string>();
             var rootDirectory = tbFilePath.Text;
+            if (String.IsNullOrEmpty(rootDirectory))
+            {
+                System.Windows.Forms.MessageBox.Show("Please enter a path to search.", "Error");
+                return;
+            }
 
             var directories = Directory.GetDirectories(rootDirectory).ToList();
 
@@ -55,7 +62,6 @@ namespace SearchApplication
                 {
 
                 }
-
             }
 
             directories.Add(rootDirectory);
@@ -96,7 +102,14 @@ namespace SearchApplication
                         {
                             if (line.Contains(tbSearchCriteria.Text))
                             {
-                                lstResults.Items.Add(String.Format("{0} - Ln {1}", file, lineNumber.ToString()));
+                                SearchResultData newItem = new SearchResultData();
+                                newItem.FileNameAndPath = file;
+                                newItem.LineNumber = String.Format("{0} - Ln {1}", file, lineNumber.ToString());
+
+                                
+                                
+                                lstResults.Items.Add(newItem);
+                                
                                 searchResultCount++;
                                 lineNumber++;
                                 lbFound.Content = String.Format("Found: {0}",searchResultCount.ToString());                               
@@ -112,6 +125,8 @@ namespace SearchApplication
                 }
                 
             }
+
+            lbFound.Content = "Search complete. " + lbFound.Content;
         }
              
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
@@ -129,9 +144,12 @@ namespace SearchApplication
 
         private void lstResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            
             try
             {
-                Process.Start(@lstResults.SelectedItem.ToString());
+                
+                var fileName = lstResults.SelectedValue.ToString();
+                Process.Start(@fileName);
             }
             catch (Exception)
             {
