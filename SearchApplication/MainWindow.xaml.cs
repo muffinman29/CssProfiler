@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -38,7 +39,23 @@ namespace SearchApplication
 
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown();
+        }
+
+        private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            DialogResult result = fbd.ShowDialog();
+
+            //string[] files = Directory.GetFiles(fbd.SelectedPath);
+            //System.Windows.Forms.MessageBox.Show("Files found: " + files.Length.ToString(), "Message");
+
+            tbParentDirectory.Text = fbd.SelectedPath;
+        }
+
+        private void btnAnalyze_Click(object sender, RoutedEventArgs e)
+        {
+            
         }
 
 
