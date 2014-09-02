@@ -16,6 +16,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
+using SearchApplication.BusinessLogic;
 
 namespace SearchApplication
 {
@@ -70,9 +71,9 @@ namespace SearchApplication
                     {
                         directories.AddRange(Directory.GetDirectories(directories[i]).ToList());
                     }
-                    catch
+                    catch(Exception e)
                     {
-
+                        Logger.WriteToFile(e.Message);
                     }
                 }
 
@@ -90,8 +91,14 @@ namespace SearchApplication
 
             Parallel.ForEach(directories, (directory) => 
                 {
-                    try { files.AddRange(Directory.EnumerateFiles(directory).Where(x => fileExtensions.Contains(FileExtension(x)))); }
-                    catch{}
+                    try 
+                    { 
+                        files.AddRange(Directory.EnumerateFiles(directory).Where(x => fileExtensions.Contains(FileExtension(x)))); 
+                    }
+                    catch(Exception e)
+                    {
+                        Logger.WriteToFile(e.Message);
+                    }
                 }
                 );           
 
@@ -143,9 +150,9 @@ namespace SearchApplication
                     prgSearch.Value = ((double)fileCounter / (double)fileCount) * 100;
 
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    
+                    Logger.WriteToFile(e.Message);
                     
                 }
                 
@@ -185,9 +192,9 @@ namespace SearchApplication
                 Process.Start("notepad.exe ", @fileName);
                 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                
+                Logger.WriteToFile(ex.Message);
                
             }
             
