@@ -24,6 +24,7 @@ namespace SearchApplication
     /// </summary>
     public partial class FileSearch : Window
     {
+        bool cancel = false;
         public FileSearch()
         {
             InitializeComponent();
@@ -33,6 +34,9 @@ namespace SearchApplication
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            prgSearch.Value = 0;
+            cancel = false;
+            btnSearch.IsEnabled = false;
             lstResults.SelectedIndex = -1;
             lstResults.Items.Clear();
             lbNumberOfFiles.Content = "Searching, please wait...";
@@ -50,6 +54,8 @@ namespace SearchApplication
                 return;
             }
 
+            lbNumberOfFiles.Content = "Getting folders, please wait.";
+
             var directories = Directory.GetDirectories(rootDirectory).ToList();
 
             for (int i = 0; i < directories.Count; i++)
@@ -62,10 +68,17 @@ namespace SearchApplication
                 {
 
                 }
-            }
+            }            
 
             directories.Add(rootDirectory);
+
+            lbNumberOfFiles.Content = String.Format("Number of folders: {0}. Searching files, please wait.", directories.Count.ToString());
+            
             string[] fileExtensions = tbFileExtensions.Text.Split(',');
+            for (int i = 0; i < fileExtensions.Length; i++)
+            {
+                fileExtensions[i] = fileExtensions[i].Trim();
+            }
 
             Parallel.ForEach(directories, (directory) => 
                 {
@@ -91,6 +104,7 @@ namespace SearchApplication
 
             string line;
             int searchResultCount = 0;
+            int fileCounter = 0;
             foreach (var file in directoriesToSearch)
             {
                 try
@@ -98,7 +112,7 @@ namespace SearchApplication
                     using (StreamReader reader = new StreamReader(file))
                     {
                         int lineNumber = 1;
-                        while ((line = await reader.ReadLineAsync()) != null)
+                        while ((line = await reader.ReadLineAsync()) != null && !cancel)
                         {
                             if (line.Contains(tbSearchCriteria.Text))
                             {
@@ -117,6 +131,9 @@ namespace SearchApplication
                             }
                         }
                     }
+                    fileCounter++;
+                    prgSearch.Value = ((double)fileCounter / (double)fileCount) * 100;
+
                 }
                 catch (Exception)
                 {
@@ -127,6 +144,7 @@ namespace SearchApplication
             }
 
             lbFound.Content = "Search complete. " + lbFound.Content;
+            btnSearch.IsEnabled = true;
         }
              
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
@@ -149,7 +167,8 @@ namespace SearchApplication
             {
                 
                 var fileName = lstResults.SelectedValue.ToString();
-                Process.Start(@fileName);
+                Process.Start("notepad.exe ", @fileName);
+                
             }
             catch (Exception)
             {
@@ -158,5 +177,12 @@ namespace SearchApplication
             }
             
         }
+
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            cancel = true;
+        }
+
+       
     }
 }

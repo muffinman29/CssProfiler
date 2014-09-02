@@ -5,8 +5,8 @@
     <Grid>
         <Label Content="Folder Path:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="93"/>
         <TextBox x:Name="tbFilePath" HorizontalAlignment="Left" Height="23" Margin="236,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="495"/>
-        <Button Content="Search" HorizontalAlignment="Left" Margin="236,98,0,0" VerticalAlignment="Top" Width="144" Click="Button_Click"/>
-        <ListBox x:Name="lstResults" Margin="10,139,12,9" SelectionChanged="lstResults_SelectionChanged" DisplayMemberPath="LineNumber" ItemsSource="{Binding}" SelectedValuePath="FileNameAndPath"/>
+        <Button x:Name="btnSearch" Content="Search" HorizontalAlignment="Left" Margin="236,98,0,0" VerticalAlignment="Top" Width="144" Click="Button_Click"/>
+        <ListBox x:Name="lstResults" Margin="10,171,12,41" SelectionChanged="lstResults_SelectionChanged" DisplayMemberPath="LineNumber" ItemsSource="{Binding}" SelectedValuePath="FileNameAndPath"/>
         <Label Content="Search Criteria:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" Width="93"/>
         <TextBox x:Name="tbSearchCriteria" HorizontalAlignment="Left" Height="23" Margin="236,38,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="495"/>
         <Label Content="File Extensions (separated by commas):" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="221"/>
@@ -14,6 +14,8 @@
         <Button x:Name="btnBrowse" Content="Browse" HorizontalAlignment="Left" Margin="736,10,0,0" VerticalAlignment="Top" Width="144" Click="btnBrowse_Click"/>
         <Label x:Name="lbNumberOfFiles" Content="" HorizontalAlignment="Left" Margin="385,66,0,0" VerticalAlignment="Top" Width="346"/>
         <Label x:Name="lbFound" Content="Found: 0" HorizontalAlignment="Left" Margin="385,92,0,0" VerticalAlignment="Top" Width="346"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="236,125,0,0" VerticalAlignment="Top" Width="144" Click="btnCancel_Click"/>
+        <ProgressBar x:Name="prgSearch" HorizontalAlignment="Left" Margin="10,0,0,10" Width="258" Height="26" VerticalAlignment="Bottom"/>
 
 
     </Grid>
