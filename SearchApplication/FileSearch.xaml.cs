@@ -47,30 +47,38 @@ namespace SearchApplication
         {
             
             List<string> files = new List<string>();
-            var rootDirectory = tbFilePath.Text;
-            if (String.IsNullOrEmpty(rootDirectory))
+            //var rootDirectory = tbFilePath.Text;
+            List<string> directories = new List<string>();
+
+            var rootDirectories = tbFilePath.Text.Split(';');
+
+            foreach (var rootDirectory in rootDirectories)
             {
-                System.Windows.Forms.MessageBox.Show("Please enter a path to search.", "Error");
-                return;
+                if (String.IsNullOrEmpty(rootDirectory))
+                {
+                    System.Windows.Forms.MessageBox.Show("Please enter a path to search.", "Error");
+                    return;
+                }
+
+                lbNumberOfFiles.Content = "Getting folders, please wait.";
+
+                directories = Directory.GetDirectories(rootDirectory).ToList();
+
+                for (int i = 0; i < directories.Count; i++)
+                {
+                    try
+                    {
+                        directories.AddRange(Directory.GetDirectories(directories[i]).ToList());
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                directories.Add(rootDirectory);
             }
-
-            lbNumberOfFiles.Content = "Getting folders, please wait.";
-
-            var directories = Directory.GetDirectories(rootDirectory).ToList();
-
-            for (int i = 0; i < directories.Count; i++)
-            {
-                try
-                {
-                    directories.AddRange(Directory.GetDirectories(directories[i]).ToList());
-                }
-                catch
-                {
-
-                }
-            }            
-
-            directories.Add(rootDirectory);
+           
 
             lbNumberOfFiles.Content = String.Format("Number of folders: {0}. Searching files, please wait.", directories.Count.ToString());
             
@@ -154,8 +162,15 @@ namespace SearchApplication
 
             //string[] files = Directory.GetFiles(fbd.SelectedPath);
             //System.Windows.Forms.MessageBox.Show("Files found: " + files.Length.ToString(), "Message");
-
-            tbFilePath.Text = fbd.SelectedPath;
+            if (tbFilePath.Text == "")
+            {
+                tbFilePath.Text = fbd.SelectedPath;
+            }
+            else
+            {
+                tbFilePath.Text += ";" + fbd.SelectedPath;
+            }
+            
 
             
         }
