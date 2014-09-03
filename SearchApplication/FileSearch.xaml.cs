@@ -12,13 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.IO;
+//using System.IO;
 using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
 using SearchApplication.BusinessLogic;
 using System.Windows.Interop;
 using System.Drawing;
+using Delimon.Win32.IO;
 
 namespace SearchApplication
 {
@@ -28,7 +29,7 @@ namespace SearchApplication
     public partial class FileSearch : Window
     {
         bool cancel = false;
-        bool hasErrors = false;
+        
         public FileSearch()
         {
             InitializeComponent();
@@ -60,6 +61,7 @@ namespace SearchApplication
 
             foreach (var rootDirectory in rootDirectories)
             {
+                var tempRootDirectories = new List<string>();
                 if (String.IsNullOrEmpty(rootDirectory))
                 {
                     System.Windows.Forms.MessageBox.Show("Please enter a path to search.", "Error");
@@ -68,29 +70,32 @@ namespace SearchApplication
 
                 lbNumberOfFiles.Content = "Getting folders, please wait.";
 
-                directories = Directory.GetDirectories(rootDirectory).ToList();
+                tempRootDirectories = Directory.GetDirectories(rootDirectory).ToList();
+                //directories.AddRange(Directory.GetDirectories(rootDirectory).ToList());
 
                 for (int i = 0; i < directories.Count; i++)
                 {
                     try
                     {
-                        directories.AddRange(Directory.GetDirectories(directories[i]).ToList());
+                        tempRootDirectories.AddRange(Directory.GetDirectories(directories[i]).ToList());
                     }
                     catch(Exception e)
                     {
                         Logger.WriteToFile(e.Message);
-                        hasErrors = true;
+                        ShowErrorIcon();
                     }
                 }
 
-                directories.Add(rootDirectory);
+                tempRootDirectories.Add(rootDirectory);
+
+                directories.AddRange(tempRootDirectories);
             }
            
 
             lbNumberOfFiles.Content = String.Format("Number of folders: {0}. Searching files, please wait.", directories.Count.ToString());
             
             string[] fileExtensions = tbFileExtensions.Text.Split(',');
-            for (int i = 0; i < fileExtensions.Length; i++)
+            for (int i = 0; i < fileExtensions.Count(); i++)
             {
                 fileExtensions[i] = fileExtensions[i].Trim();
             }
@@ -99,21 +104,18 @@ namespace SearchApplication
                 {
                     try 
                     { 
-                        files.AddRange(Directory.EnumerateFiles(directory).Where(x => fileExtensions.Contains(FileExtension(x)))); 
+                        
+                        files.AddRange(Directory.GetFiles(directory).Where(x => fileExtensions.Contains(FileExtension(x)))); 
                     }
                     catch(Exception e)
                     {
                         Logger.WriteToFile(e.Message);
-                        hasErrors = true;
+                        ShowErrorIcon();
                     }
                 }
                 );           
 
-            DisplayResultInformation(directories.Count, files.Count, files);
-            if (hasErrors)
-            {
-                imgError.Visibility = Visibility.Visible;
-            }
+            DisplayResultInformation(directories.Count, files.Count, files);           
         }
 
         private string FileExtension(string file)
@@ -134,8 +136,8 @@ namespace SearchApplication
             foreach (var file in directoriesToSearch)
             {
                 try
-                {
-                    using (StreamReader reader = new StreamReader(file))
+                {                    
+                    using (System.IO.StreamReader reader = new System.IO.StreamReader(file))
                     {
                         int lineNumber = 1;
                         while ((line = await reader.ReadLineAsync()) != null && !cancel)
@@ -151,10 +153,12 @@ namespace SearchApplication
                                 lstResults.Items.Add(newItem);
                                 
                                 searchResultCount++;
-                                lineNumber++;
+                                
                                 lbFound.Content = String.Format("Found: {0}",searchResultCount.ToString());                               
                                 
                             }
+
+                            lineNumber++;
                         }
                     }
                     fileCounter++;
@@ -164,7 +168,7 @@ namespace SearchApplication
                 catch (Exception e)
                 {
                     Logger.WriteToFile(e.Message);
-                    hasErrors = true;
+                    ShowErrorIcon();
                 }
                 
             }
@@ -194,19 +198,17 @@ namespace SearchApplication
         }
 
         private void lstResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            
+        {            
             try
-            {
-                
+            {                
                 var fileName = lstResults.SelectedValue.ToString();
-                Process.Start("notepad.exe ", @fileName);
+                Process.Start(@fileName);
                 
             }
             catch (Exception ex)
             {
                 Logger.WriteToFile(ex.Message);
-                hasErrors = true;
+               ShowErrorIcon();
             }
             
         }
@@ -217,11 +219,19 @@ namespace SearchApplication
         }
 
         private void imgError_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            
+        {            
             var loggingDirectory = String.Format("{0}\\Logs\\errors.txt", Environment.CurrentDirectory);
             Process.Start(@loggingDirectory);
+        }
 
+        private void ShowErrorIcon()
+        {
+            imgError.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private void HideErrorIcon()
+        {
+            imgError.Visibility = System.Windows.Visibility.Hidden;
         }
 
        

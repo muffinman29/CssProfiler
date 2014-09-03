@@ -12,16 +12,25 @@ namespace SearchApplication.BusinessLogic
 
         public static void WriteToFile(string message)
         {
-            var loggingDirectory = String.Format("{0}\\Logs", Environment.CurrentDirectory);
-            if (!Directory.Exists(loggingDirectory))
+            try
             {
-                Directory.CreateDirectory(loggingDirectory);
+                var loggingDirectory = String.Format("{0}\\Logs", Environment.CurrentDirectory);
+                if (!Directory.Exists(loggingDirectory))
+                {
+                    Directory.CreateDirectory(loggingDirectory);
+                }
+
+                using (StreamWriter writer = new StreamWriter(String.Format("{0}\\errors.txt", loggingDirectory), true))
+                {
+                    writer.WriteLine("{0}\t{1}", DateTime.Now.ToString(), message);
+                }
+            }
+            catch (Exception)
+            {
+                
+               
             }
             
-            using(StreamWriter writer = new StreamWriter(String.Format("{0}\\errors.txt", loggingDirectory),true))
-            {
-                writer.WriteLine(message);
-            }
         }
     }
 }
