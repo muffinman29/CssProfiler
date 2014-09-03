@@ -17,6 +17,8 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
 using SearchApplication.BusinessLogic;
+using System.Windows.Interop;
+using System.Drawing;
 
 namespace SearchApplication
 {
@@ -26,9 +28,12 @@ namespace SearchApplication
     public partial class FileSearch : Window
     {
         bool cancel = false;
+        bool hasErrors = false;
         public FileSearch()
         {
             InitializeComponent();
+            imgError.Source = Imaging.CreateBitmapSourceFromHIcon(System.Drawing.SystemIcons.Error.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            imgError.Visibility = Visibility.Hidden;
         }
 
         
@@ -74,6 +79,7 @@ namespace SearchApplication
                     catch(Exception e)
                     {
                         Logger.WriteToFile(e.Message);
+                        hasErrors = true;
                     }
                 }
 
@@ -98,11 +104,16 @@ namespace SearchApplication
                     catch(Exception e)
                     {
                         Logger.WriteToFile(e.Message);
+                        hasErrors = true;
                     }
                 }
                 );           
 
             DisplayResultInformation(directories.Count, files.Count, files);
+            if (hasErrors)
+            {
+                imgError.Visibility = Visibility.Visible;
+            }
         }
 
         private string FileExtension(string file)
@@ -153,7 +164,7 @@ namespace SearchApplication
                 catch (Exception e)
                 {
                     Logger.WriteToFile(e.Message);
-                    
+                    hasErrors = true;
                 }
                 
             }
@@ -195,7 +206,7 @@ namespace SearchApplication
             catch (Exception ex)
             {
                 Logger.WriteToFile(ex.Message);
-               
+                hasErrors = true;
             }
             
         }
@@ -203,6 +214,14 @@ namespace SearchApplication
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             cancel = true;
+        }
+
+        private void imgError_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            
+            var loggingDirectory = String.Format("{0}\\Logs\\errors.txt", Environment.CurrentDirectory);
+            Process.Start(@loggingDirectory);
+
         }
 
        
