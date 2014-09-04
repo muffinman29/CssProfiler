@@ -39,16 +39,27 @@ namespace SearchApplication
             imgError.Source = Imaging.CreateBitmapSourceFromHIcon(System.Drawing.SystemIcons.Error.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             imgError.Width = imgError.Source.Width;
             imgError.Height = imgError.Source.Height;
-            imgError.Visibility = Visibility.Hidden;
+            imgError.Visibility = Visibility.Hidden;           
+
             directories = new List<string>();
             files = new List<string>();
             mySearcher = new FileSearcher();
+        }
+
+        private bool ValidateFields()
+        {
+            return !(String.IsNullOrEmpty(tbFileExtensions.Text.Trim()) || String.IsNullOrEmpty(tbFilePath.Text.Trim()) || String.IsNullOrEmpty(tbSearchCriteria.Text.Trim()));
         }
 
         
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if (!ValidateFields())
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to perform the search. Please make sure you have entered the correct information and try again.", "Error");
+                return;
+            }
             prgSearch.Value = 0;
             cancel = false;
             btnSearch.IsEnabled = false;
@@ -163,7 +174,7 @@ namespace SearchApplication
                 try
                 {
 
-                    files.AddRange(Directory.GetFiles(directory).Where(x => fileExtensions.Contains(FileExtension(x))));
+                    files.AddRange(Directory.GetFiles(directory).Where(x => fileExtensions.Contains(FileExtension(x.ToLower()))));
                 }
                 catch (Exception e)
                 {
@@ -212,7 +223,7 @@ namespace SearchApplication
                             int lineNumber = 1;
                             while ((line = await reader.ReadLineAsync()) != null)
                             {
-                                if (line.Contains(tbSearchCriteria.Text))
+                                if (line.ToLower().Contains(tbSearchCriteria.Text.ToLower()))
                                 {
                                     SearchResultData newItem = new SearchResultData();
                                     newItem.FileNameAndPath = file;
