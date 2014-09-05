@@ -32,9 +32,10 @@ namespace SearchApplication
         private List<string> directories;
         private List<string> files;
         FileSearcher mySearcher;
-        
+        bool hasError;
         public FileSearch()
         {
+            hasError = false;
             InitializeComponent();
             imgError.Source = Imaging.CreateBitmapSourceFromHIcon(System.Drawing.SystemIcons.Error.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             imgError.Width = imgError.Source.Width;
@@ -77,14 +78,28 @@ namespace SearchApplication
             //    ShowErrorIcon();
             //}
             var rootDirectories = tbFilePath.Text.Split(';');
-            foreach (var root in rootDirectories)
-            {
-                GetDirectories(root);
-            }
+            //List<Task> tasks = new List<Task>();
+            Parallel.ForEach(rootDirectories, (root) => GetDirectories(root));
+            //foreach (var root in rootDirectories)
+            //{
 
-            GetFilesByExtension();
-            
+            //    //tasks.Add(Task.Factory.StartNew(() =>
+            //    //GetDirectories(root)));
+            //    Parallel.Invoke(() => GetDirectories(root));
+                
+            //}            
+
+            //Task.WaitAll(tasks.ToArray());
+            string[] fileExtensions = tbFileExtensions.Text.Split(',');
+            //Parallel.Invoke(() => GetFilesByExtension(fileExtensions));
+            //Task.Factory.StartNew(() => GetFilesByExtension(fileExtensions));
+
+            //Task.WaitAny();
+            GetFilesByExtension(fileExtensions);
             DisplayResultInformation();
+
+            if (hasError)
+                ShowErrorIcon();
         }
 
         private void GetDirectories(string rootDirectory)
@@ -95,12 +110,14 @@ namespace SearchApplication
             //    System.Windows.Forms.MessageBox.Show("Please enter a path to search.", "Error");
             //    return;
             //}  
-
+            
+            
             string[] subDirs = null;
 
             try
             {
                 subDirs = Directory.GetDirectories(rootDirectory, "*", SearchOption.TopDirectoryOnly);
+                //Parallel.ForEach(subDirs, (item) => directories.Add(item));
                 foreach (var item in subDirs)
                 {
                     directories.Add(item);
@@ -114,15 +131,18 @@ namespace SearchApplication
 
             try
             {
+                //Parallel.ForEach(subDirs, (dirInfo) => GetDirectories(dirInfo));
                 foreach (var dirInfo in subDirs)
                 {
                     GetDirectories(dirInfo);
                 }
+                
             }
             catch (Exception e)
             {
                 Logger.WriteToFile(e.Message);
             }
+            
 
                    
 
@@ -159,18 +179,21 @@ namespace SearchApplication
             
         }
 
-        private void GetFilesByExtension()
+        private void GetFilesByExtension(string[] fileExtensions)
         {
-            bool hasError = false;
-            string[] fileExtensions = tbFileExtensions.Text.Split(',');
+            //bool hasError = false;
+            //string[] fileExtensions = tbFileExtensions.Text.Split(',');
 
             for (int i = 0; i < fileExtensions.Count(); i++)
             {
                 fileExtensions[i] = fileExtensions[i].Trim();
             }
 
-            Parallel.ForEach(directories, (directory) =>
+            //List<Task> tasks = new List<Task>();
+
+            foreach (var directory in directories)
             {
+                
                 try
                 {
 
@@ -181,12 +204,29 @@ namespace SearchApplication
                     Logger.WriteToFile(e.Message);
                     hasError = true;
                 }
-            });
-
-            if (hasError)
-            {
-                ShowErrorIcon();
             }
+
+            //Task.WaitAll(tasks.ToArray());
+
+
+            //Parallel.ForEach(directories, (directory) =>
+            //{
+            //    try
+            //    {
+
+            //        files.AddRange(Directory.GetFiles(directory).Where(x => fileExtensions.Contains(FileExtension(x.ToLower()))));
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        Logger.WriteToFile(e.Message);
+            //        hasError = true;
+            //    }
+            //});
+
+            //if (hasError)
+            //{
+            //    ShowErrorIcon();
+            //}
         
         }
 
@@ -220,27 +260,40 @@ namespace SearchApplication
                     {
                         using (System.IO.StreamReader reader = new System.IO.StreamReader(file))
                         {
-                            int lineNumber = 1;
+                            int lineNumber = 1;                            
+                            string lineNumbers = "";
+                            bool foundResult = false;
                             while ((line = await reader.ReadLineAsync()) != null)
                             {
-                                if (line.ToLower().Contains(tbSearchCriteria.Text.ToLower()))
+
+                                bool caseSensitiveSearch = cbCaseSensitive.IsChecked.Value;
+                                
+                                if (caseSensitiveSearch && CaseSensitiveSearch(line, tbSearchCriteria.Text))
                                 {
-                                    SearchResultData newItem = new SearchResultData();
-                                    newItem.FileNameAndPath = file;
-                                    newItem.LineNumber = String.Format("{0} - Ln {1}", file, lineNumber.ToString());
-
-
-
-                                    lstResults.Items.Add(newItem);
-
+                                    //AddResultToList(file, lineNumber.ToString());
                                     searchResultCount++;
-
                                     lbFound.Content = String.Format("Found: {0}", searchResultCount.ToString());
-
+                                    lineNumbers += String.Format("{0}, ", lineNumber.ToString());
+                                    foundResult = true;
+                                    //oldFileName = file;
                                 }
+                                else if (!caseSensitiveSearch && CaseInsensitiveSearch(line, tbSearchCriteria.Text))
+                                {
+                                    //AddResultToList(file, lineNumber.ToString());
+                                    searchResultCount++;
+                                    lbFound.Content = String.Format("Found: {0}", searchResultCount.ToString());
+                                    lineNumbers += String.Format("{0}, ", lineNumber.ToString());
+                                    foundResult = true;
+                                    //oldFileName = file;
+                                }                               
 
                                 lineNumber++;
                             }
+                            if (foundResult)
+                            {
+                                AddResultToList(file, lineNumbers);
+                            }
+                            
                         }
                         fileCounter++;
                         prgSearch.Value = ((double)fileCounter / (double)files.Count) * 100;
@@ -250,7 +303,6 @@ namespace SearchApplication
                         SearchEnd();
                         return;
                     }
-
                 }
                 catch (Exception e)
                 {
@@ -261,6 +313,25 @@ namespace SearchApplication
             }
             SearchEnd();
             
+        }
+
+        private void AddResultToList(string file, string lineNumber)
+        {
+            SearchResultData newItem = new SearchResultData();
+            lineNumber = lineNumber.Remove(lineNumber.LastIndexOf(','));
+            newItem.FileNameAndPath = file;
+            newItem.LineNumber = String.Format("{0} - Ln {1}", file, lineNumber);
+            lstResults.Items.Add(newItem);
+        }
+
+        private bool CaseSensitiveSearch(string searchString, string searchCriteria)
+        {
+            return searchString.Contains(searchCriteria);   
+        }
+
+        private bool CaseInsensitiveSearch(string searchString, string searchCriteria)
+        {
+            return searchString.ToLower().Contains(searchCriteria.ToLower());
         }
 
         private void SearchEnd()

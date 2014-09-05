@@ -17,6 +17,7 @@
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="236,125,0,0" VerticalAlignment="Top" Width="144" Click="btnCancel_Click"/>
         <ProgressBar x:Name="prgSearch" HorizontalAlignment="Left" Margin="10,0,0,10" Width="258" Height="26" VerticalAlignment="Bottom"/>
         <Image x:Name="imgError" Margin="0,0,5,5" MouseDown="imgError_MouseDown" Stretch="Fill" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="43"/>
+        <CheckBox x:Name="cbCaseSensitive" Content="Case Sensitive" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="221"/>
 
 
     </Grid>
