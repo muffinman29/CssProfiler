@@ -29,8 +29,8 @@ namespace SearchApplication
     public partial class FileSearch : Window
     {
         bool cancel = false;
-        private List<string> directories;
-        private List<string> files;
+        //private List<string> directories;
+       // private List<string> files;
         FileSearcher mySearcher;
         bool hasError;
         public FileSearch()
@@ -42,8 +42,8 @@ namespace SearchApplication
             imgError.Height = imgError.Source.Height;
             imgError.Visibility = Visibility.Hidden;           
 
-            directories = new List<string>();
-            files = new List<string>();
+            //directories = new List<string>();
+            //files = new List<string>();
             mySearcher = new FileSearcher();
         }
 
@@ -67,8 +67,30 @@ namespace SearchApplication
             lstResults.SelectedIndex = -1;
             lstResults.Items.Clear();
             lbNumberOfFiles.Content = "Searching, please wait...";
-            directories.Clear();
-            files.Clear();
+            //directories.Clear();
+            //files.Clear();
+
+            //  1. Perform Search
+            //  2. Get Directories
+
+            //  Order does not matter
+            //  Can have multiple root folders
+            var directories = new List<string>();
+            var rootDirectories = tbFilePath.Text.Split(';');
+            //foreach (var item in rootDirectories)
+            //{
+            //   directories.AddRange(GetDirectories(item, directories));
+            //}
+            
+
+            Parallel.ForEach(rootDirectories, (item) => directories.AddRange(GetDirectories(item, directories)));
+
+            //  3. Get Files in Directories
+            //  4. Get Matching Results
+
+
+
+
             //FileSearcher mySearcher = new FileSearcher();
             //mySearcher.GetDirectories(tbFilePath.Text, tbFileExtensions.Text);
             //directories = mySearcher.Directories;
@@ -77,9 +99,9 @@ namespace SearchApplication
             //{
             //    ShowErrorIcon();
             //}
-            var rootDirectories = tbFilePath.Text.Split(';');
+           
             //List<Task> tasks = new List<Task>();
-            Parallel.ForEach(rootDirectories, (root) => GetDirectories(root));
+           // Parallel.ForEach(rootDirectories, (root) => GetDirectories(root));
             //foreach (var root in rootDirectories)
             //{
 
@@ -95,14 +117,15 @@ namespace SearchApplication
             //Task.Factory.StartNew(() => GetFilesByExtension(fileExtensions));
 
             //Task.WaitAny();
-            GetFilesByExtension(fileExtensions);
-            DisplayResultInformation();
+            List<string> files = new List<string>();            
+            files.AddRange(GetFilesByExtension(fileExtensions, directories, files));
+            DisplayResultInformation(directories, files);
 
             if (hasError)
                 ShowErrorIcon();
         }
 
-        private void GetDirectories(string rootDirectory)
+        private List<string> GetDirectories(string rootDirectory, List<string> directories)
         {
 
             //if (String.IsNullOrEmpty(tbFilePath.Text))
@@ -110,7 +133,7 @@ namespace SearchApplication
             //    System.Windows.Forms.MessageBox.Show("Please enter a path to search.", "Error");
             //    return;
             //}  
-            
+            //List<string> directories = new List<string>();
             
             string[] subDirs = null;
 
@@ -134,7 +157,7 @@ namespace SearchApplication
                 //Parallel.ForEach(subDirs, (dirInfo) => GetDirectories(dirInfo));
                 foreach (var dirInfo in subDirs)
                 {
-                    GetDirectories(dirInfo);
+                    GetDirectories(dirInfo, directories);
                 }
                 
             }
@@ -142,8 +165,8 @@ namespace SearchApplication
             {
                 Logger.WriteToFile(e.Message);
             }
-            
 
+            return directories;
                    
 
             //var tempRootDirectories = new List<string>();
@@ -179,7 +202,7 @@ namespace SearchApplication
             
         }
 
-        private void GetFilesByExtension(string[] fileExtensions)
+        private List<string> GetFilesByExtension(string[] fileExtensions, List<string> directories, List<string> files)
         {
             //bool hasError = false;
             //string[] fileExtensions = tbFileExtensions.Text.Split(',');
@@ -205,6 +228,8 @@ namespace SearchApplication
                     hasError = true;
                 }
             }
+
+            return files;
 
             //Task.WaitAll(tasks.ToArray());
 
@@ -244,7 +269,7 @@ namespace SearchApplication
             return "." + fileParts[fileParts.Length - 1];
         }
 
-        private async void DisplayResultInformation()
+        private async void DisplayResultInformation(List<string> directories, List<string> files)
         {
             lbNumberOfFiles.Content = String.Format("Number of folders: {0}. Files found: {1}", directories.Count.ToString(), files.Count.ToString());
             lbFound.Content = "Found: 0";
