@@ -71,14 +71,16 @@ namespace SearchApplication
             }
 
             ClearScreen();
+
             var directories = new List<string>();
             var rootDirectories = tbFilePath.Text.Split(';');
             int counter = 0;
+
             foreach (var item in rootDirectories)
             {
                var dirs = await Task.Factory.StartNew(() => GetDirectories(item, directories));
                counter++;
-               prgSearch.Value = (double)rootDirectories.Count() / (double)counter * 100;                
+               prgSearch.Value = ((double)rootDirectories.Count() / (double)counter) * 100;                
                directories.AddRange(dirs);
             }
 
@@ -89,6 +91,9 @@ namespace SearchApplication
             List<string> files = new List<string>();            
             files.AddRange(GetFilesByExtension(fileExtensions, directories, files));
             files = files.Distinct().ToList();
+            files.Sort();
+            directories.Sort();
+
             DisplayResultInformation(directories, files);
 
             if (hasError)
@@ -283,7 +288,15 @@ namespace SearchApplication
         private void DisplayErrorLog()
         {
             var loggingDirectory = String.Format("{0}\\Logs\\errors.txt", Environment.CurrentDirectory);
-            Process.Start(@loggingDirectory);
+            if (File.Exists(loggingDirectory))
+            {
+                Process.Start(@loggingDirectory);
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("The error log does not exist on this sytem.", "Error");
+            }
+            
         }
 
         private void ShowErrorIcon()
@@ -347,18 +360,9 @@ namespace SearchApplication
                                                     new XAttribute("FolderPaths", tbFilePath.Text.Trim()), 
                                                     new XAttribute("SearchTerms", tbSearchCriteria.Text.Trim()), 
                                                     new XAttribute("FileExtensions", tbFileExtensions.Text.Trim()),
-                                                    new XAttribute("CaseSensitive", cbCaseSensitive.IsChecked.Value.ToString())));
-                //StringBuilder configString = new StringBuilder();
-                //configString.AppendLine("[Folder Paths]");
-                //configString.AppendLine(tbFilePath.Text.Trim());
-                //configString.AppendLine("[Search Terms]");
-                //configString.AppendLine(tbSearchCriteria.Text.Trim());
-                //configString.AppendLine("[File Extensions]");
-                //configString.AppendLine(tbFileExtensions.Text.Trim());
+                                                    new XAttribute("CaseSensitive", cbCaseSensitive.IsChecked.Value.ToString())));               
 
-                doc.Save(dialog.FileName);
-
-               // File.WriteAllText(dialog.FileName, doc.ToString());
+                doc.Save(dialog.FileName);              
             }
         }
 
@@ -372,16 +376,21 @@ namespace SearchApplication
             {
                 XDocument doc = XDocument.Load(dialog.FileName);
 
-                var blah = from p in doc.Descendants("Main") select new { FolderPaths = p.Attribute("FolderPaths").Value, SearchTerms = p.Attribute("SearchTerms").Value, FileExtensions = p.Attribute("FileExtensions").Value, CaseSensitive = p.Attribute("CaseSensitive").Value };
+                var xml = from p in doc.Descendants("Main") select new 
+                            { 
+                                FolderPaths = p.Attribute("FolderPaths").Value, 
+                                SearchTerms = p.Attribute("SearchTerms").Value, 
+                                FileExtensions = p.Attribute("FileExtensions").Value, 
+                                CaseSensitive = p.Attribute("CaseSensitive").Value 
+                            };
 
-                foreach (var item in blah)
+                foreach (var item in xml)
                 {
                     tbFileExtensions.Text = item.FileExtensions;
                     tbFilePath.Text = item.FolderPaths;
                     tbSearchCriteria.Text = item.SearchTerms;
                     cbCaseSensitive.IsChecked = item.CaseSensitive == "True" ? true : false;
-                }
-                
+                }                
             }
         }
 
