@@ -32,6 +32,8 @@ namespace SearchApplication
     {
         bool cancel = false;
         bool hasError;
+
+        private SearchConfig config;
         public FileSearch()
         {
             hasError = false;
@@ -40,6 +42,8 @@ namespace SearchApplication
             imgError.Width = imgError.Source.Width;
             imgError.Height = imgError.Source.Height;
             imgError.Visibility = Visibility.Hidden;
+
+            config = new SearchConfig();
         }
 
         private bool ValidateFields()
@@ -59,7 +63,20 @@ namespace SearchApplication
             lbFound.Content = "";
         }
 
-        
+        private string[] IgnoredFolders()
+        {
+            return config.IgnoreFolders.Split(';');
+        }
+
+        private bool CaseSensitive()
+        {
+            return config.CaseSensitive;
+        }
+
+        private bool SearchFileNames()
+        {
+            return config.SearchFileNames;
+        }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -115,10 +132,13 @@ namespace SearchApplication
         private List<string> GetDirectories(string rootDirectory, List<string> directories)
         {   
             string[] subDirs = null;
+            string[] ignoredDirectories = IgnoredFolders();
 
             try
             {
-                subDirs = Directory.GetDirectories(rootDirectory, "*", SearchOption.TopDirectoryOnly);
+                subDirs = Directory.GetDirectories(rootDirectory, "*", SearchOption.TopDirectoryOnly)
+                            .Where(x => !ignoredDirectories.Contains(x))
+                            .ToArray();
                
                 foreach (var item in subDirs)
                 {
@@ -196,10 +216,10 @@ namespace SearchApplication
                             bool foundResult = false;
                             while ((line = await reader.ReadLineAsync()) != null)
                             {
-                                bool caseSensitiveSearch = cbCaseSensitive.IsChecked.Value;
+                                //bool caseSensitiveSearch = cbCaseSensitive.IsChecked.Value;
                                 
-                                if ((caseSensitiveSearch && CaseSensitiveSearch(line, tbSearchCriteria.Text)) 
-                                    || (!caseSensitiveSearch && CaseInsensitiveSearch(line, tbSearchCriteria.Text)))
+                                if ((CaseSensitive() && CaseSensitiveSearch(line, tbSearchCriteria.Text))
+                                    || (!CaseSensitive() && CaseInsensitiveSearch(line, tbSearchCriteria.Text)))
                                 {
                                     searchResultCount++;
                                     lbFound.Content = String.Format("Found: {0}", searchResultCount.ToString());
@@ -359,8 +379,7 @@ namespace SearchApplication
                 XDocument doc = new XDocument(new XElement("Main", 
                                                     new XAttribute("FolderPaths", tbFilePath.Text.Trim()), 
                                                     new XAttribute("SearchTerms", tbSearchCriteria.Text.Trim()), 
-                                                    new XAttribute("FileExtensions", tbFileExtensions.Text.Trim()),
-                                                    new XAttribute("CaseSensitive", cbCaseSensitive.IsChecked.Value.ToString())));               
+                                                    new XAttribute("FileExtensions", tbFileExtensions.Text.Trim())));               
 
                 doc.Save(dialog.FileName);              
             }
@@ -380,18 +399,29 @@ namespace SearchApplication
                             { 
                                 FolderPaths = p.Attribute("FolderPaths").Value, 
                                 SearchTerms = p.Attribute("SearchTerms").Value, 
-                                FileExtensions = p.Attribute("FileExtensions").Value, 
-                                CaseSensitive = p.Attribute("CaseSensitive").Value 
+                                FileExtensions = p.Attribute("FileExtensions").Value
                             };
 
                 foreach (var item in xml)
                 {
                     tbFileExtensions.Text = item.FileExtensions;
                     tbFilePath.Text = item.FolderPaths;
-                    tbSearchCriteria.Text = item.SearchTerms;
-                    cbCaseSensitive.IsChecked = item.CaseSensitive == "True" ? true : false;
+                    tbSearchCriteria.Text = item.SearchTerms;                    
                 }                
             }
+        }
+
+        private void searchOptionsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            SearchConfiguration config = new SearchConfiguration();
+            config.Closed += config_Closed;
+            config.Owner = this;
+            config.Show();
+        }
+
+        void config_Closed(object sender, EventArgs e)
+        {
+            config = new SearchConfig();
         }
 
        

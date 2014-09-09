@@ -24,7 +24,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>5</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -114,6 +114,10 @@
     <Compile Include="Analyzer.cs" />
     <Compile Include="BusinessLogic\FileSearcher.cs" />
     <Compile Include="BusinessLogic\Logger.cs" />
+    <Compile Include="SearchConfig.cs" />
+    <Compile Include="SearchConfiguration.xaml.cs">
+      <DependentUpon>SearchConfiguration.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SearchResultData.cs" />
     <Page Include="FileSearch.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -129,6 +133,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchConfiguration.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

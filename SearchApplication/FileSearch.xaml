@@ -5,7 +5,7 @@
     <Grid>
         <Label Content="Folder Path:" HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top" Width="93"/>
         <TextBox x:Name="tbFilePath" HorizontalAlignment="Left" Height="23" Margin="108,28,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="674"/>
-        <Button x:Name="btnSearch" Content="Search" HorizontalAlignment="Left" Margin="209,115,0,0" VerticalAlignment="Top" Width="144" Click="Button_Click"/>
+        <Button x:Name="btnSearch" Content="Search" HorizontalAlignment="Left" Margin="108,115,0,0" VerticalAlignment="Top" Width="144" Click="Button_Click"/>
         <ListBox x:Name="lstResults" Margin="10,171,10,41" DisplayMemberPath="LineNumber" ItemsSource="{Binding}" SelectedValuePath="FileNameAndPath" PreviewMouseDown="lstResults_PreviewMouseDown"/>
         <Label Content="Search Criteria:" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top" Width="93"/>
         <TextBox x:Name="tbSearchCriteria" HorizontalAlignment="Left" Height="23" Margin="108,56,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="674"/>
@@ -13,9 +13,7 @@
         <TextBox x:Name="tbFileExtensions" HorizontalAlignment="Left" Height="23" Margin="108,87,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="674"/>
         <Button x:Name="btnBrowse" Content="Browse" HorizontalAlignment="Left" Margin="787,29,0,0" VerticalAlignment="Top" Width="144" Click="btnBrowse_Click"/>
 
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="358,115,0,0" VerticalAlignment="Top" Width="144" Click="btnCancel_Click"/>
-
-        <CheckBox x:Name="cbCaseSensitive" Content="Case Sensitive" HorizontalAlignment="Left" Margin="108,115,0,0" VerticalAlignment="Top" Width="96" Height="22"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="638,115,0,0" VerticalAlignment="Top" Width="144" Click="btnCancel_Click"/>
         <StatusBar Height="36" VerticalAlignment="Bottom" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -55,7 +53,7 @@
             </MenuItem>
             <MenuItem Header="Edit">
                 <MenuItem Header="Copy" x:Name="copyMenuItem" Click="copyMenuItem_Click"></MenuItem>
-                <MenuItem Header="Search Options"></MenuItem>                
+                <MenuItem Header="Search Options" Name="searchOptionsMenuItem" Click="searchOptionsMenuItem_Click"></MenuItem>                
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="View Error Log" x:Name="viewErrorLog" Click="viewErrorLog_Click"></MenuItem>
