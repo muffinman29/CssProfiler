@@ -1,31 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Delimon.Win32.IO;
+﻿using System.Collections.Generic;
 using SearchApplication.Annotations;
 
 namespace SearchApplication.BusinessLogic
 {
 	class FileSearcher
 	{
+/*
 	    private bool Error { [UsedImplicitly] get; set; }
+*/
 
-	    private List<string> Directories { get; set; }
-	    private List<string> Files { get; set; }
+	    private List<string> Directories { [UsedImplicitly] get; set; }
+	    private List<string> Files { [UsedImplicitly] get; set; }
 
-		private readonly bool _cancel;
+		//private readonly bool _cancel;
 
 		public FileSearcher()
 		{
 			Directories = new List<string>();
 			Files = new List<string>();
-			_cancel = false;
+			//_cancel = false;
 		}
 
+/*
 		public void GetDirectories(string filePath, string fileExtension)
 		{
-			bool hasError = false;
+			var hasError = false;
 
 			var rootDirectories = filePath.Split(';');
 			var tempRootDirectories = new List<string>();
@@ -60,7 +59,7 @@ namespace SearchApplication.BusinessLogic
 				Directories.AddRange(tempRootDirectories);
 			}
 
-			foreach (string directory in Directories)
+			foreach (var directory in Directories)
 			{
 			    try
 			    {
@@ -73,8 +72,8 @@ namespace SearchApplication.BusinessLogic
 			    }
 			}
 
-		    string[] fileExtensions = fileExtension.Split(',');
-			for (int i = 0; i < fileExtensions.Count(); i++)
+		    var fileExtensions = fileExtension.Split(',');
+			for (var i = 0; i < fileExtensions.Count(); i++)
 			{
 				fileExtensions[i] = fileExtensions[i].Trim();
 			}
@@ -113,13 +112,17 @@ namespace SearchApplication.BusinessLogic
 				Error = true;
 			}
 		}
+*/
 
+/*
 		private string FileExtension(string file)
 		{
 			var fileParts = file.Split('.');
 			return "." + fileParts[fileParts.Length - 1];
 		}
+*/
 
+/*
 		private async Task<List<SearchResultData>> DisplayResultInformation(string searchCriteria)
 		{
 			//lbNumberOfFiles.Content = String.Format("Number of folders: {0}. Files found: {1}", directories.Count.ToString(), files.Count.ToString());
@@ -176,6 +179,7 @@ namespace SearchApplication.BusinessLogic
 			//lbFound.Content = "Search complete. " + lbFound.Content;
 			//btnSearch.IsEnabled = true;
 		}
+*/
 
 	}
 }

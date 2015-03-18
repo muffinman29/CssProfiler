@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace SearchApplication
+﻿namespace SearchApplication
 {
     /// <summary>
     /// Interaction logic for App.xaml

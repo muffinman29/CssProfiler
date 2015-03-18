@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Xml.Linq;
+using SearchApplication.Annotations;
 
 namespace SearchApplication
 {
@@ -38,7 +39,7 @@ namespace SearchApplication
             }
         }
         public bool CaseSensitive { get; private set; }
-        public bool SearchFileNames { get; private set; }
+        private bool SearchFileNames { [UsedImplicitly] get; set; }
         public string IgnoreFolders { get; private set; }
     }
 }

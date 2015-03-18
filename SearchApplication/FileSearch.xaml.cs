@@ -65,10 +65,12 @@ namespace SearchApplication
             return _config.CaseSensitive;
         }
 
+/*
         private bool SearchFileNames()
         {
             return _config.SearchFileNames;
         }
+*/
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -316,10 +318,12 @@ namespace SearchApplication
             ImgError.Visibility = Visibility.Visible;
         }
 
+/*
         private void HideErrorIcon()
         {
             ImgError.Visibility = Visibility.Hidden;
         }
+*/
 
         private void lstResults_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {

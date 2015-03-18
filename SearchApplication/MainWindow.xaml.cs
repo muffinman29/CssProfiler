@@ -45,10 +45,12 @@ namespace SearchApplication
             
         }
 
+/*
         private void FindInlineCss()
         { 
             
         }
+*/
 
 
     }
