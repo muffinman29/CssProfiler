@@ -1,18 +1,7 @@
 ﻿using Delimon.Win32.IO;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace SearchApplication
@@ -20,7 +9,7 @@ namespace SearchApplication
     /// <summary>
     /// Interaction logic for SearchConfiguration.xaml
     /// </summary>
-    public partial class SearchConfiguration : Window
+    public partial class SearchConfiguration
     {
         public SearchConfiguration()
         {
@@ -41,9 +30,9 @@ namespace SearchApplication
 
                 if (elements != null)
                 {
-                    cbCaseSensitive.IsChecked = Convert.ToBoolean(elements.CaseSensitive);
-                    cbSearchFileNames.IsChecked = Convert.ToBoolean(elements.SearchFileNames);
-                    tbIgnoreFolders.Text = elements.IgnoreFolders.ToString();
+                    CbCaseSensitive.IsChecked = Convert.ToBoolean(elements.CaseSensitive);
+                    CbSearchFileNames.IsChecked = Convert.ToBoolean(elements.SearchFileNames);
+                    TbIgnoreFolders.Text = elements.IgnoreFolders;
                 }
 
             }
@@ -56,7 +45,7 @@ namespace SearchApplication
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void CreateOrUpdateXmlConfiguration()
@@ -75,10 +64,10 @@ namespace SearchApplication
                 File.Delete(filename);               
             }
 
-            XDocument doc = new XDocument(new XElement("Configuration",
-                                                   new XAttribute("CaseSensitive", cbCaseSensitive.IsChecked.Value.ToString()),
-                                                   new XAttribute("SearchFileNames", cbSearchFileNames.IsChecked.Value.ToString()),
-                                                   new XAttribute("IgnoreFolders", tbIgnoreFolders.Text.Trim())));
+            var doc = new XDocument(new XElement("Configuration",
+                                                   new XAttribute("CaseSensitive", (CbCaseSensitive.IsChecked != null && CbCaseSensitive.IsChecked.Value).ToString()),
+                                                   new XAttribute("SearchFileNames", (CbSearchFileNames.IsChecked != null && CbSearchFileNames.IsChecked.Value).ToString()),
+                                                   new XAttribute("IgnoreFolders", TbIgnoreFolders.Text.Trim())));
             doc.Save(filename);
         }
     }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace SearchApplication.BusinessLogic
@@ -20,9 +16,9 @@ namespace SearchApplication.BusinessLogic
                     Directory.CreateDirectory(loggingDirectory);
                 }
 
-                using (StreamWriter writer = new StreamWriter(String.Format("{0}\\errors.txt", loggingDirectory), true))
+                using (var writer = new StreamWriter(String.Format("{0}\\errors.txt", loggingDirectory), true))
                 {
-                    writer.WriteLine("{0}\t{1}", DateTime.Now.ToString(), message);
+                    writer.WriteLine("{0}\t{1}", DateTime.Now, message);
                 }
             }
             catch (Exception)

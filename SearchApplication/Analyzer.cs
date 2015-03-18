@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SearchApplication
@@ -19,14 +18,14 @@ namespace SearchApplication
             return directories.Count + subDirectories.Count + 1;
         }
 
-        private List<string> GetSubDirectories(List<string> parentDirectories)
+        private List<string> GetSubDirectories(IEnumerable<string> parentDirectories)
         {
-            List<string> subDirectories = new List<string>();
-            for (int i = 0; i < parentDirectories.Count; i++)
+            var subDirectories = new List<string>();
+            foreach (string directory in parentDirectories)
             {
                 try
                 {
-                    subDirectories.AddRange(Directory.GetDirectories(parentDirectories[i]).ToList());
+                    subDirectories.AddRange(Directory.GetDirectories(directory).ToList());
                 }
                 catch (Exception)
                 {
@@ -39,7 +38,7 @@ namespace SearchApplication
         }
         public List<string> GetDirectories(string rootDirectory)
         {
-            List<string> files = new List<string>();
+            var files = new List<string>();
             
             if (String.IsNullOrEmpty(rootDirectory))
             {
@@ -53,9 +52,9 @@ namespace SearchApplication
             directories.AddRange(subDirectories);
             directories.Add(rootDirectory);
 
-            string fileExtension = ".csv";
+            const string fileExtension = ".csv";
             
-            Parallel.ForEach(directories, (directory) =>
+            Parallel.ForEach(directories, directory =>
             {
                 try { files.AddRange(Directory.EnumerateFiles(directory).Where(x => FileExtension(x).Contains(fileExtension))); }
                 catch { }

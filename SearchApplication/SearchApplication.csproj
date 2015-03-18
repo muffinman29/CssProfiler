@@ -114,6 +114,7 @@
     <Compile Include="Analyzer.cs" />
     <Compile Include="BusinessLogic\FileSearcher.cs" />
     <Compile Include="BusinessLogic\Logger.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="SearchConfig.cs" />
     <Compile Include="SearchConfiguration.xaml.cs">
       <DependentUpon>SearchConfiguration.xaml</DependentUpon>

@@ -1,9 +1,6 @@
 ﻿using Delimon.Win32.IO;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace SearchApplication
@@ -29,7 +26,7 @@ namespace SearchApplication
                 {
                     CaseSensitive = Convert.ToBoolean(elements.CaseSensitive);
                     SearchFileNames = Convert.ToBoolean(elements.SearchFileNames);
-                    IgnoreFolders = elements.IgnoreFolders.ToString();
+                    IgnoreFolders = elements.IgnoreFolders;
                 }
 
             }
@@ -40,8 +37,8 @@ namespace SearchApplication
                 IgnoreFolders = String.Empty;
             }
         }
-        public bool CaseSensitive { get; set; }
-        public bool SearchFileNames { get; set; }
-        public string IgnoreFolders { get; set; }
+        public bool CaseSensitive { get; private set; }
+        public bool SearchFileNames { get; private set; }
+        public string IgnoreFolders { get; private set; }
     }
 }

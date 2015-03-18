@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SearchApplication.Annotations;
 
 namespace SearchApplication
 {
     class SearchResultData : IEnumerable
     {
         public String FileNameAndPath { get; set; }
-        public String LineNumber { get; set; }
+        public String LineNumber { [UsedImplicitly] get; set; }
 
-        public IEnumerator GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return ((IEnumerable) this).GetEnumerator();
         }
     }
 }

@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Delimon.Win32.IO;
+using SearchApplication.Annotations;
 
 namespace SearchApplication.BusinessLogic
 {
 	class FileSearcher
-	{        
-		public bool Error { get; set; }
+	{
+	    private bool Error { [UsedImplicitly] get; set; }
 
-		public List<string> Directories { get; set; }
-		public List<string> Files { get; set; }
+	    private List<string> Directories { get; set; }
+	    private List<string> Files { get; set; }
 
-		private bool cancel;
+		private readonly bool _cancel;
 
 		public FileSearcher()
 		{
 			Directories = new List<string>();
 			Files = new List<string>();
-			cancel = false;
+			_cancel = false;
 		}
 
 		public void GetDirectories(string filePath, string fileExtension)
@@ -34,7 +34,7 @@ namespace SearchApplication.BusinessLogic
 				
 				if (String.IsNullOrEmpty(rootDirectory))
 				{
-					System.Windows.Forms.MessageBox.Show("Please enter a path to search.", "Error");
+					System.Windows.Forms.MessageBox.Show(@"Please enter a path to search.", @"Error");
 					return;
 				}
 
@@ -60,26 +60,26 @@ namespace SearchApplication.BusinessLogic
 				Directories.AddRange(tempRootDirectories);
 			}
 
-			for (int i = 0; i < Directories.Count; i++)
+			foreach (string directory in Directories)
 			{
-				try
-				{
-					tempRootDirectories.AddRange(Directory.GetDirectories(Directories[i], "*", SearchOption.AllDirectories).ToList());
-				}
-				catch (Exception e)
-				{
-					Logger.WriteToFile(e.Message);
-					Error = true;
-				}
+			    try
+			    {
+			        tempRootDirectories.AddRange(Directory.GetDirectories(directory, "*", SearchOption.AllDirectories).ToList());
+			    }
+			    catch (Exception e)
+			    {
+			        Logger.WriteToFile(e.Message);
+			        Error = true;
+			    }
 			}
 
-			string[] fileExtensions = fileExtension.Split(',');
+		    string[] fileExtensions = fileExtension.Split(',');
 			for (int i = 0; i < fileExtensions.Count(); i++)
 			{
 				fileExtensions[i] = fileExtensions[i].Trim();
 			}
 
-			Parallel.ForEach(Directories, (directory) =>
+			Parallel.ForEach(Directories, directory =>
 			{
 				try
 				{
@@ -125,26 +125,28 @@ namespace SearchApplication.BusinessLogic
 			//lbNumberOfFiles.Content = String.Format("Number of folders: {0}. Files found: {1}", directories.Count.ToString(), files.Count.ToString());
 			//lbFound.Content = "Found: 0";
 
-			List<SearchResultData> searchResults = new List<SearchResultData>();
-			string line;
-			int searchResultCount = 0;
-			int fileCounter = 0;
+			var searchResults = new List<SearchResultData>();
+		    int searchResultCount = 0;
+		    int fileCounter = 0;
 			foreach (var file in Files)
 			{
 				//try
 				//{
-					using (System.IO.StreamReader reader = new System.IO.StreamReader(file))
+					using (var reader = new System.IO.StreamReader(file))
 					{
 						int lineNumber = 1;
-						while ((line = await reader.ReadLineAsync()) != null && !cancel)
+					    string line;
+					    while ((line = await reader.ReadLineAsync()) != null && !_cancel)
 						{
 							if (line.Contains(searchCriteria))
 							{
-								SearchResultData newItem = new SearchResultData();
-								newItem.FileNameAndPath = file;
-								newItem.LineNumber = String.Format("{0} - Ln {1}", file, lineNumber.ToString());
+								var newItem = new SearchResultData
+								{
+								    FileNameAndPath = file,
+								    LineNumber = String.Format("{0} - Ln {1}", file, lineNumber)
+								};
 
-								searchResults.Add(newItem);
+							    searchResults.Add(newItem);
 								
 								//lstResults.Items.Add(newItem);
 

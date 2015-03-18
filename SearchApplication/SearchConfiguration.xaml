@@ -3,11 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="SearchConfiguration" Height="360" Width="350" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
-        <CheckBox x:Name="cbCaseSensitive" Content="Case Sensitive" HorizontalAlignment="Right" Margin="0,0,238,303" VerticalAlignment="Bottom" Width="96" Height="19"/>
-        <TextBox Name="tbIgnoreFolders" Height="178" Width="324" Margin="0,0,10,53" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextWrapping="Wrap"></TextBox>
+        <CheckBox x:Name="CbCaseSensitive" Content="Case Sensitive" HorizontalAlignment="Right" Margin="0,0,238,303" VerticalAlignment="Bottom" Width="96" Height="19"/>
+        <TextBox x:Name="TbIgnoreFolders" Height="178" Width="324" Margin="0,0,10,53" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextWrapping="Wrap"></TextBox>
         <Label Content="Ignore Paths:" HorizontalAlignment="Right" Margin="0,0,60,236" VerticalAlignment="Bottom" Width="274"/>
-        <Button Name="btnApply" Content="Apply" HorizontalAlignment="Left" Margin="10,284,0,0" VerticalAlignment="Top" Width="120" Click="btnApply_Click"/>
-        <Button Name="btnCancel" Content="Close" HorizontalAlignment="Left" Margin="164,284,0,0" VerticalAlignment="Top" Width="120" Click="btnCancel_Click"/>
-        <CheckBox Name="cbSearchFileNames" Content="Search Files Names" HorizontalAlignment="Right" Margin="0,34,163,0" VerticalAlignment="Top" Width="171"/>
+        <Button x:Name="BtnApply" Content="Apply" HorizontalAlignment="Left" Margin="10,284,0,0" VerticalAlignment="Top" Width="120" Click="btnApply_Click"/>
+        <Button x:Name="BtnCancel" Content="Close" HorizontalAlignment="Left" Margin="164,284,0,0" VerticalAlignment="Top" Width="120" Click="btnCancel_Click"/>
+        <CheckBox x:Name="CbSearchFileNames" Content="Search Files Names" HorizontalAlignment="Right" Margin="0,34,163,0" VerticalAlignment="Top" Width="171"/>
     </Grid>
 </Window>
