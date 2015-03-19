@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace SearchApplication
@@ -42,15 +43,36 @@ namespace SearchApplication
 
         private void btnAnalyze_Click(object sender, RoutedEventArgs e)
         {
+            //  STEP 1. Get a list of folders to search.
+            //  var foldersToSearch =   GetFolders(string root);
+            //  STEP 2. Get a list of css, html, cfm, aspx files found in step 1.
+            //  var files   =   GetFiles(foldersToSearch);
+            //  STEP 3. Analyze each file for issues
+            //  FindInLineCss(files);
+            //  STEP 4. Report issues
+            //  DisplayResults();
+            
+
+
+            
             
         }
 
-/*
+        private string GetFolders(string root)
+        {
+            return "";
+        }
+
+        private string GetFiles(string foldersToSearch)
+        {
+            return "";
+        }
+        
         private void FindInlineCss()
         { 
             
         }
-*/
+        
 
 
     }

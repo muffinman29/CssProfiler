@@ -85,28 +85,31 @@ namespace SearchApplication
 
             var directories = new List<string>();
             var rootDirectories = TbFilePath.Text.Split(';');
-            int counter = 0;
+            //int counter = 0;
 
             foreach (var item in rootDirectories)
             {
                 string item1 = item;
                 List<string> directories1 = directories;
+                LbFound.Content = "Getting directories...";
                 var dirs = await Task.Factory.StartNew(() => GetDirectories(item1, directories1));
-               counter++;
-               PrgSearch.Value = (rootDirectories.Count() / (double)counter) * 100;                
+
+               //counter++;
                directories.AddRange(dirs);
             }
 
+            LbFound.Content = "Directories collected. Sorting list...";
             directories = directories.Distinct().ToList();
 
             string[] fileExtensions = TbFileExtensions.Text.Split(',');
            
-            var files = new List<string>();            
+            var files = new List<string>();
+            LbFound.Content = "Searching in files...";
             files.AddRange(GetFilesByExtension(fileExtensions, directories, files));
             files = files.Distinct().ToList();
             files.Sort();
             directories.Sort();
-
+            LbFound.Content = "Search complete. Displaying results.";
             DisplayResultInformation(directories, files);
 
             if (_hasError)
